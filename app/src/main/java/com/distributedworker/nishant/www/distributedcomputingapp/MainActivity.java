@@ -53,6 +53,15 @@ public class MainActivity extends AppCompatActivity {
         this.startService(i);
     }
 
+    public void receiveFileClicked(View view)
+    {
+        // use this to start and trigger a service
+        Intent i= new Intent(this, FileReceiveService.class);
+        // potentially add data to the intent
+        i.putExtra("KEY1", "Value to be used by the service");
+        this.startService(i);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
