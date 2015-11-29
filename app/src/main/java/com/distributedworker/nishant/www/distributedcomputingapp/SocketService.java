@@ -1,6 +1,7 @@
 package com.distributedworker.nishant.www.distributedcomputingapp;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.IBinder;
@@ -10,6 +11,8 @@ import android.widget.Toast;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -51,17 +54,6 @@ public class SocketService extends Service {
                 client = new Socket("10.0.0.7", 4444);  //connect to server
                 Log.d("ClientApp", "Started");
 
-                //in = new DataInputStream(client.getInputStream()); // READ FROM SERVER
-                //out = new DataOutputStream(client.getOutputStream()); // WRITE TO SERVER
-
-                //String s= "This is new from Android";
-                //out.writeUTF(s);
-
-                //String FromServer = "server says: "+in.readUTF();
-                //Log.d("ClientApp:From Server: ", FromServer);
-
-
-
                 printwriter = new PrintWriter(client.getOutputStream(),true);
 
                 // receiving from server ( receiveRead  object)
@@ -69,25 +61,54 @@ public class SocketService extends Service {
                 BufferedReader receiveRead = new BufferedReader(new InputStreamReader(istream));
 
                 String receiveMessage;
-                String sendMessage = "This is New from Android";
+//                String sendMessage = "This is New from Android";
+//
+//                printwriter.println(sendMessage);       // sending to server
+//                printwriter.flush();                    // flush the data
 
-                printwriter.println(sendMessage);       // sending to server
-                printwriter.flush();                    // flush the data
 
+                String filename = "myfile.txt";
+                FileOutputStream outputStream;
+                outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
                 while(true)
                 {
-                    if((receiveMessage = receiveRead.readLine()) != null) //receive from server
-                    {
+                    if((receiveMessage = receiveRead.readLine()) != null) {
+
+
+                        outputStream.write(receiveMessage.getBytes());
+                        outputStream.write("\n Hello from Nishant \n".getBytes());
+
                         System.out.println("From PC - " +receiveMessage); // displaying at DOS prompt
+                        if(receiveMessage.equals("done")){
+                            System.out.println("End");
+                            break;
+                        }
                     }
                 }
+                outputStream.close();
+                System.out.println("Out of while");
+
+                //Read the gile just saved
+                System.out.println("File open");
+                FileInputStream fin = openFileInput(filename);
+                int c;
+                String temp="";
+                while( (c = fin.read()) != -1){
+                    temp = temp + Character.toString((char)c);
+                }
+                //string temp contains all the data of the file.
+                fin.close();
+                System.out.println("Ready to send");
+
+                PrintWriter printwriter;
+                printwriter = new PrintWriter(client.getOutputStream(),true);
+                printwriter.println(temp);       // sending to server
+                printwriter.flush();                    // flush the data
+                System.out.println("File sent");
 
 
-                //printwriter.write("This is from Android");  //write the message to output stream
-                //printwriter.flush();
-                //printwriter.close();
 
-
+            return "done";
             } catch (IOException e) {
                 return "Not done";
             }
