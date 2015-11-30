@@ -51,7 +51,7 @@ public class SocketService extends Service {
         protected String doInBackground(String... urls) {
             try {
 
-                client = new Socket("10.0.0.7", 4444);  //connect to server
+                client = new Socket("10.0.0.7", 10000);  //connect to server
                 Log.d("ClientApp", "Started");
 
                 printwriter = new PrintWriter(client.getOutputStream(),true);
@@ -74,15 +74,15 @@ public class SocketService extends Service {
                 {
                     if((receiveMessage = receiveRead.readLine()) != null) {
 
-
-                        outputStream.write(receiveMessage.getBytes());
-                        outputStream.write("\n Hello from Nishant \n".getBytes());
-
-                        System.out.println("From PC - " +receiveMessage); // displaying at DOS prompt
-                        if(receiveMessage.equals("done")){
+                        if(receiveMessage.equals("---fileSendingFinishedByServer---")){
                             System.out.println("End");
                             break;
                         }
+                        outputStream.write(receiveMessage.getBytes());
+                        //outputStream.write("\n Hello from Nishant \n".getBytes());
+
+                        //System.out.println("From PC - " + receiveMessage); // displaying at DOS prompt
+
                     }
                 }
                 outputStream.close();
@@ -90,11 +90,24 @@ public class SocketService extends Service {
 
                 //Read the gile just saved
                 System.out.println("File open");
+
+                // OPENING THE REQUIRED TEXT FILE
+//                BufferedReader reader = new BufferedReader(new InputStreamReader(
+//                        getAssets().open("myfile.txt")));
+//
+//                String myLine = reader.readLine();
+
+
+                double count = 0.0;
+                long count2 = 0;
                 FileInputStream fin = openFileInput(filename);
                 int c;
                 String temp="";
                 while( (c = fin.read()) != -1){
                     temp = temp + Character.toString((char)c);
+                    count = count + 0.001;
+                    count2++;
+
                 }
                 //string temp contains all the data of the file.
                 fin.close();
@@ -102,9 +115,9 @@ public class SocketService extends Service {
 
                 PrintWriter printwriter;
                 printwriter = new PrintWriter(client.getOutputStream(),true);
-                printwriter.println(temp);       // sending to server
+                printwriter.println(count2);       // sending to server
                 printwriter.flush();                    // flush the data
-                System.out.println("File sent");
+                System.out.println("File sent: " +count);
 
 
 
@@ -113,11 +126,11 @@ public class SocketService extends Service {
                 return "Not done";
             }
             finally {
-                try {
-                    client.close();   //closing the connection
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    //client.close();   //closing the connection
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
             }
 
         }
