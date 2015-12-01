@@ -69,24 +69,29 @@ public class SocketService extends Service {
 
                 String filename = "myfile.txt";
                 FileOutputStream outputStream;
-                outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+                outputStream = openFileOutput(filename, Context.MODE_PRIVATE| MODE_APPEND);//| MODE_APPEND
+
+                String ReceivedFile="";
                 while(true)
                 {
                     if((receiveMessage = receiveRead.readLine()) != null) {
-
+                        System.out.println(receiveMessage);
                         if(receiveMessage.equals("---fileSendingFinishedByServer---")){
                             System.out.println("End");
                             break;
                         }
-                        outputStream.write(receiveMessage.getBytes());
+                        ReceivedFile = ReceivedFile + receiveMessage;
+                        //outputStream.write(receiveMessage.getBytes());
                         //outputStream.write("\n Hello from Nishant \n".getBytes());
 
                         //System.out.println("From PC - " + receiveMessage); // displaying at DOS prompt
 
                     }
                 }
+                outputStream.write(ReceivedFile.getBytes());
                 outputStream.close();
                 System.out.println("Out of while");
+                System.out.println("Received File - " +ReceivedFile);
 
                 //Read the gile just saved
                 System.out.println("File open");
@@ -99,25 +104,29 @@ public class SocketService extends Service {
 
 
                 double count = 0.0;
-                long count2 = 0;
-                FileInputStream fin = openFileInput(filename);
-                int c;
-                String temp="";
-                while( (c = fin.read()) != -1){
-                    temp = temp + Character.toString((char)c);
-                    count = count + 0.001;
-                    count2++;
+                long count2 = ReceivedFile.length();
+                System.out.println("String Length " +ReceivedFile.length());
+//                FileInputStream fin = openFileInput(filename);
+//                int c;
+//                String temp="";
+//                while( (c = fin.read()) != -1){
+//                    temp = temp + Character.toString((char)c);
+//                    count = count + 0.001;
+//                    //count2++;
+//                    //System.out.print(temp);
+//
+//
+//                }
+//                //string temp contains all the data of the file.
+//                fin.close();
 
-                }
-                //string temp contains all the data of the file.
-                fin.close();
                 System.out.println("Ready to send");
 
                 PrintWriter printwriter;
                 printwriter = new PrintWriter(client.getOutputStream(),true);
                 printwriter.println(count2);       // sending to server
                 printwriter.flush();                    // flush the data
-                System.out.println("File sent: " +count);
+                System.out.println("File sent: " +count2);
 
 
 

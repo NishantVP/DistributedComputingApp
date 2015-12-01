@@ -56,7 +56,9 @@ public class socketChannel extends Service {
 
                 String newData = "New String to write to file..." + System.currentTimeMillis();
 
-                ByteBuffer buf = ByteBuffer.allocate(48);
+                ByteBuffer buf = ByteBuffer.allocate(1024);
+                ByteBuffer buffer = ByteBuffer.allocateDirect(1024);
+
                 buf.clear();
                 buf.put(newData.getBytes());
 
@@ -65,6 +67,16 @@ public class socketChannel extends Service {
                 while(buf.hasRemaining()) {
                     socketChannel.write(buf);
                 }
+
+                // Receive message
+                buffer.clear();
+                // ...populate the buffer...
+                socketChannel.read(buffer);
+                buffer.flip(); // flip the buffer for reading
+                byte[] bytes = new byte[buffer.remaining()]; // create a byte array the length of the number of bytes written to the buffer
+                buffer.get(bytes); // read the bytes that were written
+                String packet = new String(bytes);
+                System.out.println("Buffer Incoming" +packet); // How do I know how much to read?
 
                 return "done";
             }
